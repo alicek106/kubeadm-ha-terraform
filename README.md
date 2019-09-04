@@ -9,7 +9,17 @@ This repository is planned to achieve below goals.
   - HA Master with internal Load Balancer (HAProxy + Heartbeat? ELB?) (+3 nodes)
   - Workers (+1 nodes)
 - Create each manifests using kubeadm (*kubeadm* command respectively)
-- **All steps should be automated by Terraform**
+- **All infra provisioning should be automated by Terraform**
+- **All installation should be automated by Ansible**
+
+## Completed Jobs
+
+- Cluster installation using kubeadm 1.15+ (HA Master with --upload-certs enabled)
+
+## Planned Works
+
+- Construct terraform files as modules
+- Install packages using Ansible
 
 ## Additional Goals
 
