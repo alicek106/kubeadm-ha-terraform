@@ -9,13 +9,13 @@ resource "aws_instance" "master" {
 
     iam_instance_profile = "${aws_iam_instance_profile.kubernetes.id}"
 
-    subnet_id = "${aws_subnet.kubernetes.id}"
+    subnet_id = "${module.aws_network_config.subnet}"
     private_ip = "${cidrhost(var.vpc_cidr, 20 + count.index)}"
     associate_public_ip_address = true # Instances have public, dynamic IP
     source_dest_check = false # TODO Required??
 
     availability_zone = "${var.zone}"
-    vpc_security_group_ids = ["${aws_security_group.kubernetes.id}"]
+    vpc_security_group_ids = ["${module.aws_network_config.security_group}"]
     key_name = "${var.default_keypair_name}"
     tags = "${merge(
     local.common_tags,
@@ -34,10 +34,10 @@ resource "aws_instance" "master" {
 resource "aws_elb" "kubernetes_api" {
     name = "${var.elb_name}"
     instances = ["${aws_instance.master.*.id}"]
-    subnets = ["${aws_subnet.kubernetes.id}"]
+    subnets = ["${module.aws_network_config.subnet}"]
     cross_zone_load_balancing = false
 
-    security_groups = ["${aws_security_group.kubernetes_api.id}"]
+    security_groups = ["${module.aws_network_config.security_group_master_api_elb}"]
 
     listener {
       lb_port = 6443
@@ -62,43 +62,6 @@ resource "aws_elb" "kubernetes_api" {
         )
     )}"
 }
-
-############
-## Security
-############
-
-resource "aws_security_group" "kubernetes_api" {
-  vpc_id = "${aws_vpc.kubernetes.id}"
-  name = "kubernetes-api"
-
-  # Allow inbound traffic to the port used by Kubernetes API HTTPS
-  ingress {
-    from_port = 6443
-    to_port = 6443
-    protocol = "TCP"
-    cidr_blocks = ["${var.control_cidr}"]
-  }
-
-  # Allow all outbound traffic
-  egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = "${merge(
-    local.common_tags,
-      map(
-        "Name", "kubernetes-api",
-        "Owner", "${var.owner}"
-      )
-  )}"
-}
-
-############
-## Outputs
-############
 
 output "kubernetes_api_dns_name" {
   value = "${aws_elb.kubernetes_api.dns_name}"
