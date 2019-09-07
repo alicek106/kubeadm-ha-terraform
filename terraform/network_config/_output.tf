@@ -25,3 +25,12 @@ output "route_table" {
 output "security_group_master_api_elb" {
   value = "${aws_security_group.kubeadm_ha_master_api_elb_security_group.id}"
 }
+
+output "vpc_cidr" {
+  value = "${var.vpc_cidr}"
+}
+
+# We don't need it right now :D
+output "api_elb_dns_name" {
+  value = "${aws_elb.kubeadm_ha_api_elb.dns_name}"
+}

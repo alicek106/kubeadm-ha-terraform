@@ -27,6 +27,10 @@ variable vpc_cidr {
   default = "20.43.0.0/16"
 }
 
+# Use from other modules
+variable master_instance_id_list{
+}
+
 # Inherit variables from root variables
 variable region {
 }

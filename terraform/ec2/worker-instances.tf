@@ -7,16 +7,14 @@ resource "aws_instance" "worker" {
     count = "${var.number_of_worker}"
     ami = "${lookup(var.amis, var.region)}"
     instance_type = "${var.worker_instance_type}"
-
-    iam_instance_profile = "${aws_iam_instance_profile.kubernetes.id}"
-
-    subnet_id = "${module.aws_network_config.subnet}"
+    iam_instance_profile = "${var.instance_profile_id}"
+    subnet_id = "${var.subnet_id}"
     private_ip = "${cidrhost(var.vpc_cidr, 30 + count.index)}"
     associate_public_ip_address = true # Instances have public, dynamic IP
     source_dest_check = false # TODO Required??
 
     availability_zone = "${var.zone}"
-    vpc_security_group_ids = ["${module.aws_network_config.security_group}"]
+    vpc_security_group_ids = ["${var.vpc_security_group_id}"]
     key_name = "${var.default_keypair_name}"
 
     tags = "${merge(
