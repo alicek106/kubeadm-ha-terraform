@@ -58,6 +58,10 @@ EOF
 
 # IAM Instance Profile for instances (worker + master)
 resource  "aws_iam_instance_profile" "kubeadm_ha_instance_profile" {
-  name = "kubeadm_ha_instance_profile"
+  # Instance Profile name should be same with IAM Role
+  # Because creating IAM Role also creates instance profile automatically
+  # Error log : EntityAlreadyExists: Instance Profile
+  # Reference : https://docs.aws.amazon.com/ko_kr/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html
+  name = "kubeadm_ha_iam_role"
   role = "${aws_iam_role.kubeadm_ha_iam_role.name}"
 }
