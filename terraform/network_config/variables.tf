@@ -29,6 +29,7 @@ variable vpc_cidr {
 
 # Use from other modules
 variable master_instance_id_list{
+  type = "list"
 }
 
 # Inherit variables from root variables
